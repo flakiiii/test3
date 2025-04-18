@@ -3,76 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Clock</title>
+    <title>Elegant Time Display</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(-150px) translateX(50px);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0.8;
+            }
+        }
+        
+        .clock-container {
+            position: relative;
+            z-index: 1;
+            padding: 2.5rem;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .clock-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .title {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #fdbb2d, #b21f1f);
+            border-radius: 3px;
+        }
+        
+        .time {
+            font-size: 5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
+        }
+        
+        .date {
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        .timezone {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            font-weight: 300;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .info-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-item {
             text-align: center;
         }
-        .clock-container {
-            padding: 2rem;
-            border-radius: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 100%;
-        }
-        .time {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        .date {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .timezone {
-            font-size: 1rem;
+        
+        .info-label {
+            font-size: 0.9rem;
             opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .icon {
+            margin-right: 10px;
+            color: #fdbb2d;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .time {
+                font-size: 3.5rem;
+            }
+            .date {
+                font-size: 1.3rem;
+            }
+            .info-value {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="particles" id="particles"></div>
+    
     <div class="clock-container">
-        <h1>Current Time</h1>
+        <h1 class="title"><i class="fas fa-clock icon"></i>Time Now</h1>
         <div class="time" id="time">00:00:00</div>
         <div class="date" id="date">Monday, January 1, 2024</div>
         <div class="timezone" id="timezone">UTC+0</div>
+        
+        <div class="info-container">
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-sun icon"></i>Day</div>
+                <div class="info-value" id="day">Monday</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-calendar-day icon"></i>Day of Year</div>
+                <div class="info-value" id="dayOfYear">1</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-calendar-week icon"></i>Week</div>
+                <div class="info-value" id="weekNumber">1</div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 20 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                
+                // Random animation delay
+                const delay = Math.random() * 10;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // Random animation duration
+                const duration = Math.random() * 10 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
+        
+        function getWeekNumber(date) {
+            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+            const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        }
+        
         function updateClock() {
             const now = new Date();
             
-            // Update time
+            // Update time with smooth leading zeros
             const hours = now.getHours().toString().padStart(2, '0');
             const minutes = now.getMinutes().toString().padStart(2, '0');
             const seconds = now.getSeconds().toString().padStart(2, '0');
             document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
             
-            // Update date
+            // Update date with more elegant format
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('date').textContent = now.toLocaleDateString(undefined, options);
             
-            // Update timezone
+            // Update day of week
+            document.getElementById('day').textContent = now.toLocaleDateString(undefined, { weekday: 'long' });
+            
+            // Update day of year
+            document.getElementById('dayOfYear').textContent = getDayOfYear(now);
+            
+            // Update week number
+            document.getElementById('weekNumber').textContent = getWeekNumber(now);
+            
+            // Update timezone with nice formatting
             const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const offset = now.getTimezoneOffset();
             const offsetHours = Math.abs(Math.floor(offset / 60));
             const offsetMinutes = Math.abs(offset % 60);
             const offsetSign = offset < 0 ? '+' : '-';
-            document.getElementById('timezone').textContent = 
-                `${timezone} (UTC${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')})`;
+            document.getElementById('timezone').innerHTML = `<i class="fas fa-globe icon"></i>${timezone}<br>(UTC${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')})`;
+            
+            // Update background gradient angle based on time
+            const secondsPercent = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 86400 * 360;
+            document.body.style.backgroundPosition = `${secondsPercent}% 50%`;
         }
 
-        // Update clock immediately and then every second
-        updateClock();
-        setInterval(updateClock, 1000);
+        // Run when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
     </script>
 </body>
 </html>
